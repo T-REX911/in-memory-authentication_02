@@ -6,7 +6,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -31,17 +32,23 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return new InMemoryUserDetailsManager(
-                User.withUsername("admin").password("admin123").roles("ADMIN").build(),
-                User.withUsername("manager").password("manager123").roles("MANAGER").build(),
-                User.withUsername("cashier").password("cashier123").roles("CASHIER").build(),
-                User.withUsername("user").password("user123").roles("USER").build()
+                //User.withUsername("admin").password("admin123").roles("ADMIN").build(), //Old method without encryption
+                User.withUsername("admin").password(passwordEncoder().encode("admin123")).roles("ADMIN").build(),
+                User.withUsername("manager").password(passwordEncoder().encode("manager123")).roles("MANAGER").build(),
+                User.withUsername("cashier").password(passwordEncoder().encode("cashier123")).roles("CASHIER").build(),
+                User.withUsername("user").password(passwordEncoder().encode("user123")).roles("USER").build()
         );
     }
 
-    @SuppressWarnings("deprecation")
+    /*@SuppressWarnings("deprecation")
     @Bean
     public static org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
         // No password encryption, for simplicity
         return NoOpPasswordEncoder.getInstance();
+    }*/
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Use a strong encoder like BCrypt
     }
 }
